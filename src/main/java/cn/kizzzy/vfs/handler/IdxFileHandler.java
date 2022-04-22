@@ -1,16 +1,17 @@
 package cn.kizzzy.vfs.handler;
 
-import cn.kizzzy.io.DataOutputStreamEx;
 import cn.kizzzy.io.FullyReader;
+import cn.kizzzy.io.FullyWriter;
 import cn.kizzzy.io.SeekType;
 import cn.kizzzy.tencent.IdxFile;
 import cn.kizzzy.tencent.IdxItem;
+import cn.kizzzy.vfs.IFileHandler;
 import cn.kizzzy.vfs.IPackage;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class IdxFileHandler extends StreamFileHandler<IdxFile> {
+public class IdxFileHandler implements IFileHandler<IdxFile> {
     
     private final Charset charset;
     
@@ -23,7 +24,7 @@ public class IdxFileHandler extends StreamFileHandler<IdxFile> {
     }
     
     @Override
-    protected IdxFile loadImpl(IPackage vfs, String path, FullyReader reader) throws Exception {
+    public IdxFile load(IPackage vfs, String path, FullyReader reader, long size) throws Exception {
         IdxFile idx = new IdxFile();
         idx.path = path;
         idx.magic = reader.readIntEx();
@@ -50,7 +51,7 @@ public class IdxFileHandler extends StreamFileHandler<IdxFile> {
     }
     
     @Override
-    protected void saveImpl(DataOutputStreamEx writer, IdxFile data) throws Exception {
-        throw new UnsupportedOperationException("not support");
+    public boolean save(IPackage vfs, String path, FullyWriter writer, IdxFile data) throws Exception {
+        return false;
     }
 }
