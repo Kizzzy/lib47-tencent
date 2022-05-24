@@ -37,17 +37,4 @@ public class IdxItem implements IStreamable {
         reader.read(buffer);
         return new SliceFullReader(new ByteArrayInputStreamReader(ZlibHelper.uncompress(buffer)));
     }
-    
-    @Override
-    public String toString() {
-        return "IdxItem{" +
-            "pkg='" + pkg + '\'' +
-            ", pathLength=" + pathLength +
-            ", path='" + path + '\'' +
-            ", reserved01=" + reserved01 +
-            ", offset=" + offset +
-            ", originSize=" + originSize +
-            ", size=" + size +
-            '}';
-    }
 }
