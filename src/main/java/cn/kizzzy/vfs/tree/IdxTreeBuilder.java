@@ -5,41 +5,37 @@ import cn.kizzzy.tencent.IdxItem;
 import cn.kizzzy.vfs.ITree;
 import cn.kizzzy.vfs.Separator;
 
-public class IdxTreeBuilder extends TreeBuilder {
+public class IdxTreeBuilder extends TreeBuilderAdapter<IdxFile, IdxItem> {
     
-    private final IdxFile idx;
+    private final IdxFile idxFile;
     
-    public IdxTreeBuilder(IdxFile idx, IdGenerator idGenerator) {
+    public IdxTreeBuilder(IdxFile idxFile) {
+        this(idxFile, new IdGenerator());
+    }
+    
+    public IdxTreeBuilder(IdxFile idxFile, IdGenerator idGenerator) {
         super(Separator.BACKSLASH_SEPARATOR_LOWERCASE, idGenerator);
-        this.idx = idx;
+        this.idxFile = idxFile;
     }
     
+    @Override
     public ITree build() {
-        Root root = new Root(idGenerator.getId(), idx.path);
-        for (IdxItem file : idx.itemKvs.values()) {
-            listImpl(root, root, file);
-        }
-        return new Tree(root, separator);
-    }
-    
-    private void listImpl(Root root, Node parent, IdxItem item) {
-        String[] names = separator.split(item.path);
-        int i = 0;
-        for (String name : names) {
-            Node child = parent.children.get(name);
-            if (child == null) {
-                if (i == names.length - 1) {
-                    Leaf leaf = new Leaf(idGenerator.getId(), name, root.name, item.path, item);
-                    root.fileKvs.put(leaf.path, leaf);
-                    child = leaf;
-                } else {
-                    child = new Node(idGenerator.getId(), name);
-                }
-                root.folderKvs.put(child.id, child);
-                parent.children.put(name, child);
+        return buildImpl(idxFile, new Helper<IdxFile, IdxItem>() {
+            
+            @Override
+            public String idxPath(IdxFile idxFile) {
+                return idxFile.path;
             }
-            parent = child;
-            i++;
-        }
+            
+            @Override
+            public Iterable<IdxItem> entries(IdxFile idxFile) {
+                return idxFile.itemKvs.values();
+            }
+            
+            @Override
+            public String itemPath(IdxItem item) {
+                return item.path;
+            }
+        });
     }
 }

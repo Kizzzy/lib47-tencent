@@ -39,7 +39,7 @@ public class IdxFileHandler implements IFileHandler<IdxFile> {
             item.pkg = path;
             
             item.pathLength = reader.readShortEx();
-            item.path = reader.readString(item.pathLength, charset).toLowerCase();
+            item.path = reader.readString(item.pathLength, charset);
             item.reserved01 = reader.readIntEx();
             item.offset = reader.readUnsignedIntEx();
             item.originSize = reader.readIntEx();
