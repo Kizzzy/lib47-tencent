@@ -1,6 +1,6 @@
 package cn.kizzzy.vfs.pack;
 
-import cn.kizzzy.io.FullyReader;
+import cn.kizzzy.io.IFullyReader;
 import cn.kizzzy.tencent.IdxItem;
 import cn.kizzzy.vfs.IFileLoader;
 import cn.kizzzy.vfs.IFileSaver;
@@ -35,7 +35,7 @@ public class IdxPackage extends AbstractPackage {
             file.setSource(new FileStreamable(fullPath));
         }
         
-        try (FullyReader reader = file.OpenStream()) {
+        try (IFullyReader reader = file.OpenStream()) {
             Object obj = loader.load(this, path, reader, file.originSize);
             if (obj instanceof IStreamable) {
                 ((IStreamable) obj).setSource(file);

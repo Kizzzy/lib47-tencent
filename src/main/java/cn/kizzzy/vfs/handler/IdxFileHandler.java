@@ -1,7 +1,7 @@
 package cn.kizzzy.vfs.handler;
 
-import cn.kizzzy.io.FullyReader;
-import cn.kizzzy.io.FullyWriter;
+import cn.kizzzy.io.IFullyReader;
+import cn.kizzzy.io.IFullyWriter;
 import cn.kizzzy.io.SeekType;
 import cn.kizzzy.tencent.IdxFile;
 import cn.kizzzy.tencent.IdxItem;
@@ -24,7 +24,7 @@ public class IdxFileHandler implements IFileHandler<IdxFile> {
     }
     
     @Override
-    public IdxFile load(IPackage vfs, String path, FullyReader reader, long size) throws Exception {
+    public IdxFile load(IPackage vfs, String path, IFullyReader reader, long size) throws Exception {
         IdxFile idx = new IdxFile();
         idx.path = path;
         idx.magic = reader.readIntEx();
@@ -51,7 +51,7 @@ public class IdxFileHandler implements IFileHandler<IdxFile> {
     }
     
     @Override
-    public boolean save(IPackage vfs, String path, FullyWriter writer, IdxFile data) throws Exception {
+    public boolean save(IPackage vfs, String path, IFullyWriter writer, IdxFile data) throws Exception {
         return false;
     }
 }

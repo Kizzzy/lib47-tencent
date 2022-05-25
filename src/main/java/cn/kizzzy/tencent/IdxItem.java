@@ -2,7 +2,7 @@ package cn.kizzzy.tencent;
 
 import cn.kizzzy.helper.ZlibHelper;
 import cn.kizzzy.io.ByteArrayInputStreamReader;
-import cn.kizzzy.io.FullyReader;
+import cn.kizzzy.io.IFullyReader;
 import cn.kizzzy.io.SliceFullReader;
 import cn.kizzzy.vfs.IStreamable;
 
@@ -28,13 +28,14 @@ public class IdxItem implements IStreamable {
     }
     
     @Override
-    public FullyReader OpenStream() throws Exception {
+    public IFullyReader OpenStream() throws Exception {
         if (getSource() == null) {
             throw new NullPointerException("source is null");
         }
-        FullyReader reader = new SliceFullReader(source.OpenStream(), offset, size);
-        byte[] buffer = new byte[size];
-        reader.read(buffer);
-        return new SliceFullReader(new ByteArrayInputStreamReader(ZlibHelper.uncompress(buffer)));
+        
+        IFullyReader reader = new SliceFullReader(source.OpenStream(), offset, size);
+        byte[] buffer = reader.readBytes(size);
+        buffer = ZlibHelper.uncompress(buffer);
+        return new ByteArrayInputStreamReader(buffer);
     }
 }
