@@ -1,4 +1,4 @@
-package cn.kizzzy.vfs.handler;
+package cn.kizzzy.tencent.vfs.handler;
 
 import cn.kizzzy.io.IFullyReader;
 import cn.kizzzy.io.IFullyWriter;

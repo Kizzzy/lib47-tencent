@@ -1,9 +1,11 @@
-package cn.kizzzy.vfs.tree;
+package cn.kizzzy.tencent.vfs.tree;
 
 import cn.kizzzy.tencent.IdxFile;
 import cn.kizzzy.tencent.IdxItem;
 import cn.kizzzy.vfs.ITree;
 import cn.kizzzy.vfs.Separator;
+import cn.kizzzy.vfs.tree.IdGenerator;
+import cn.kizzzy.vfs.tree.TreeBuilderAdapter;
 
 public class IdxTreeBuilder extends TreeBuilderAdapter<IdxFile, IdxItem> {
     
