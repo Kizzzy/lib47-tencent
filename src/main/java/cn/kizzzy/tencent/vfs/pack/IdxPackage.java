@@ -1,8 +1,6 @@
 package cn.kizzzy.tencent.vfs.pack;
 
-import cn.kizzzy.io.IFullyReader;
 import cn.kizzzy.tencent.IdxItem;
-import cn.kizzzy.vfs.IFileLoader;
 import cn.kizzzy.vfs.IFileSaver;
 import cn.kizzzy.vfs.IStreamable;
 import cn.kizzzy.vfs.ITree;
@@ -23,26 +21,20 @@ public class IdxPackage extends AbstractPackage {
     }
     
     @Override
-    protected Object loadImpl(String path, IFileLoader<?> loader) throws Exception {
+    protected IStreamable getStreamableImpl(String path) {
         Leaf leaf = tree.getLeaf(path);
         if (leaf == null || !(leaf.item instanceof IdxItem)) {
             return null;
         }
         
-        IdxItem file = (IdxItem) leaf.item;
+        IdxItem idxItem = (IdxItem) leaf.item;
         
-        String fullPath = Separator.FILE_SEPARATOR.combine(root, dealWithPkgName(file.pkg));
-        if (file.getSource() == null) {
-            file.setSource(new FileStreamable(fullPath));
+        String fullPath = Separator.FILE_SEPARATOR.combine(root, dealWithPkgName(idxItem.pkg));
+        if (idxItem.getSource() == null) {
+            idxItem.setSource(new FileStreamable(fullPath));
         }
         
-        try (IFullyReader reader = file.OpenStream()) {
-            Object obj = loader.load(this, path, reader, file.originSize);
-            if (obj instanceof IStreamable) {
-                ((IStreamable) obj).setSource(file);
-            }
-            return obj;
-        }
+        return idxItem;
     }
     
     @Override
