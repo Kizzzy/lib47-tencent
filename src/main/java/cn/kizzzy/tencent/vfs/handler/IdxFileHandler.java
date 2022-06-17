@@ -4,7 +4,6 @@ import cn.kizzzy.io.IFullyReader;
 import cn.kizzzy.io.IFullyWriter;
 import cn.kizzzy.io.SeekType;
 import cn.kizzzy.tencent.IdxFile;
-import cn.kizzzy.tencent.IdxItem;
 import cn.kizzzy.vfs.IFileHandler;
 import cn.kizzzy.vfs.IPackage;
 
@@ -25,8 +24,7 @@ public class IdxFileHandler implements IFileHandler<IdxFile> {
     
     @Override
     public IdxFile load(IPackage vfs, String path, IFullyReader reader, long size) throws Exception {
-        IdxFile idx = new IdxFile();
-        idx.path = path;
+        IdxFile idx = new IdxFile(path);
         idx.magic = reader.readIntEx();
         idx.itemCount = reader.readUnsignedIntEx();
         idx.itemPosition = reader.readUnsignedIntEx();
@@ -35,17 +33,15 @@ public class IdxFileHandler implements IFileHandler<IdxFile> {
         reader.seek(idx.itemPosition, SeekType.BEGIN);
         
         for (int i = 0; i < idx.itemCount; ++i) {
-            IdxItem item = new IdxItem();
-            item.pkg = path;
+            IdxFile.Entry entry = new IdxFile.Entry(path);
+            entry.pathLength = reader.readShortEx();
+            entry.path = reader.readString(entry.pathLength, charset);
+            entry.reserved01 = reader.readIntEx();
+            entry.offset = reader.readUnsignedIntEx();
+            entry.originSize = reader.readIntEx();
+            entry.size = reader.readIntEx();
             
-            item.pathLength = reader.readShortEx();
-            item.path = reader.readString(item.pathLength, charset);
-            item.reserved01 = reader.readIntEx();
-            item.offset = reader.readUnsignedIntEx();
-            item.originSize = reader.readIntEx();
-            item.size = reader.readIntEx();
-            
-            idx.itemKvs.put(item.path, item);
+            idx.entryKvs.put(entry.path, entry);
         }
         return idx;
     }

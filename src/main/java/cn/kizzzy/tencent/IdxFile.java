@@ -1,5 +1,11 @@
 package cn.kizzzy.tencent;
 
+import cn.kizzzy.helper.ZlibHelper;
+import cn.kizzzy.io.ByteArrayInputStreamReader;
+import cn.kizzzy.io.IFullyReader;
+import cn.kizzzy.io.SliceFullReader;
+import cn.kizzzy.vfs.IInputStreamGetter;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,13 +32,67 @@ public class IdxFile {
     public long itemSize;
     
     /**
+     * all items
+     */
+    public final Map<String, Entry> entryKvs
+        = new HashMap<>();
+    
+    // -------------------- extra field --------------------
+    
+    /**
      * original file name
      */
     public String path;
     
-    /**
-     * all items
-     */
-    public final Map<String, IdxItem> itemKvs
-        = new HashMap<>();
+    public IdxFile(String path) {
+        this.path = path;
+    }
+    
+    public static class Entry implements IInputStreamGetter {
+        
+        public int pathLength;
+        
+        public String path;
+        
+        public int reserved01;
+        
+        public long offset;
+        
+        public int originSize;
+        
+        public int size;
+        
+        // -------------------- extra field --------------------
+        
+        public String pack;
+        
+        private IInputStreamGetter source;
+        
+        public Entry(String pack) {
+            this.pack = pack;
+        }
+        
+        @Override
+        public IInputStreamGetter getSource() {
+            return source;
+        }
+        
+        @Override
+        public void setSource(IInputStreamGetter source) {
+            this.source = source;
+        }
+        
+        @Override
+        public IFullyReader getInput() throws Exception {
+            if (getSource() == null) {
+                throw new NullPointerException("source is null");
+            }
+            
+            IFullyReader reader = new SliceFullReader(source.getInput(), offset, size);
+            byte[] buffer = reader.readBytes(size);
+            buffer = ZlibHelper.uncompress(buffer);
+            return new ByteArrayInputStreamReader(buffer);
+        }
+    }
+    
 }
