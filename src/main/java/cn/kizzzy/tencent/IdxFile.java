@@ -4,7 +4,7 @@ import cn.kizzzy.helper.ZlibHelper;
 import cn.kizzzy.io.ByteArrayInputStreamReader;
 import cn.kizzzy.io.IFullyReader;
 import cn.kizzzy.io.SliceFullReader;
-import cn.kizzzy.vfs.IInputStreamGetter;
+import cn.kizzzy.vfs.stream.HolderInputStreamGetter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class IdxFile {
         this.path = path;
     }
     
-    public static class Entry implements IInputStreamGetter {
+    public static class Entry extends HolderInputStreamGetter {
         
         public int pathLength;
         
@@ -66,20 +66,8 @@ public class IdxFile {
         
         public String pack;
         
-        private IInputStreamGetter source;
-        
         public Entry(String pack) {
             this.pack = pack;
-        }
-        
-        @Override
-        public IInputStreamGetter getSource() {
-            return source;
-        }
-        
-        @Override
-        public void setSource(IInputStreamGetter source) {
-            this.source = source;
         }
         
         @Override
@@ -88,11 +76,10 @@ public class IdxFile {
                 throw new NullPointerException("source is null");
             }
             
-            IFullyReader reader = new SliceFullReader(source.getInput(), offset, size);
+            IFullyReader reader = new SliceFullReader(getSource().getInput(), offset, size);
             byte[] buffer = reader.readBytes(size);
             buffer = ZlibHelper.uncompress(buffer);
             return new ByteArrayInputStreamReader(buffer);
         }
     }
-    
 }
