@@ -24,22 +24,24 @@ public class IdxFileHandler implements IFileHandler<IdxFile> {
     
     @Override
     public IdxFile load(IPackage vfs, String path, IFullyReader reader, long size) throws Exception {
+        reader.setLittleEndian(true);
+        
         IdxFile idx = new IdxFile(path);
-        idx.magic = reader.readIntEx();
-        idx.itemCount = reader.readUnsignedIntEx();
-        idx.itemPosition = reader.readUnsignedIntEx();
-        idx.itemSize = reader.readUnsignedIntEx();
+        idx.magic = reader.readInt();
+        idx.itemCount = reader.readUnsignedInt();
+        idx.itemPosition = reader.readUnsignedInt();
+        idx.itemSize = reader.readUnsignedInt();
         
         reader.seek(idx.itemPosition, SeekType.BEGIN);
         
         for (int i = 0; i < idx.itemCount; ++i) {
             IdxFile.Entry entry = new IdxFile.Entry(path);
-            entry.pathLength = reader.readShortEx();
+            entry.pathLength = reader.readShort();
             entry.path = reader.readString(entry.pathLength, charset);
-            entry.reserved01 = reader.readIntEx();
-            entry.offset = reader.readUnsignedIntEx();
-            entry.originSize = reader.readIntEx();
-            entry.size = reader.readIntEx();
+            entry.reserved01 = reader.readInt();
+            entry.offset = reader.readUnsignedInt();
+            entry.originSize = reader.readInt();
+            entry.size = reader.readInt();
             
             idx.entryKvs.put(entry.path, entry);
         }
